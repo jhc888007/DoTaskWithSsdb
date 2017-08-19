@@ -102,7 +102,7 @@ class Downloader(threading.Thread):
     def run(self):
         count = 0
         while 1:
-            if not INPUT:
+            if INPUT:
                 task = self.queue_input.pop()
                 if task == "":
                     time.sleep(THREAD_REST_TIME)
@@ -111,10 +111,10 @@ class Downloader(threading.Thread):
                 task = "{}"
             ret = self.do(task)
             if not ret:
-                if not ERROR:
+                if ERROR:
                     self.queue_error.push(task)
             else:
-                if not OUTPUT:
+                if OUTPUT:
                     for r in ret:
                         self.queue_output.push(r)
             count += 1
