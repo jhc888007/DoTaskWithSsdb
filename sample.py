@@ -10,8 +10,8 @@ sys.setdefaultencoding('UTF-8')
 
 SSDB_IP = '192.168.1.1'
 SSDB_PORT = 8888
-SRC_QUEUE = 'task_test1'
-DST_QUEUE = 'task_test2'
+SRC_QUEUE = 'task_test2'
+DST_QUEUE = 'task_test1'
 
 #--------- user define end -------------------
 
@@ -21,10 +21,12 @@ dst_queue = Queue(ssdb, DST_QUEUE)
 
 #--------- user define begin -------------------
 
-while True:
-    text = src_queue.popr()
+count = 0
+while count < 5:
+    text = src_queue.get(count, 1)
+    count += 1
     if not text:
         break
-    dst_queue.pushr(text)
+    dst_queue.pushr(text[0])
     
 #--------- user define end -------------------

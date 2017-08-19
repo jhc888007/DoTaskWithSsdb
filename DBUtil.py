@@ -57,6 +57,13 @@ class Queue:
             return ""
         return "ok"
 
+    def get(self, start, num):
+        size = num
+        result = self.db.request('qrange', [self.name, start, size])
+        if result.code != "ok":
+            return []
+        return result.data
+ 
     def get1000(self, start):
         size = 1000
         result = self.db.request('qrange', [self.name, start, size])

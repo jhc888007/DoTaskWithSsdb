@@ -9,12 +9,12 @@ sys.setdefaultencoding('UTF-8')
 
 #JSON
 def json_decode(data, coding="utf-8"):
-    result = ""
+    result = {}
     try:
         result = json.loads(data,encoding=coding,strict=False)
     except Exception,e:
         print e
-        result = ""
+        result = {}
     return result
 
 def json_encode(data, coding="utf-8"):
