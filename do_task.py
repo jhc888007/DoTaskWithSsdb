@@ -20,12 +20,12 @@ sys.setdefaultencoding('UTF-8')
 
 #--------- user define begin -------------------
 #THREAD
-THREAD_NUM = 8
+THREAD_NUM = 4
 THREAD_SLEEP_TIME = 0
 THREAD_REST_TIME = 30
 
 #HTTP
-MAX_TRY_TIME = 5
+MAX_TRY_TIME = 8
 FAIL_SLEEP_TIME = 1
 
 #SSDB
@@ -38,7 +38,7 @@ OUTPUT = "task_test2"
 ERROR = "task_test3"
 
 #log
-LOG_PATH = "./data/task.log"
+LOG_PATH = "./data/do_task.log"
 
 #--------- user define end -------------------
 
@@ -84,10 +84,10 @@ class Downloader(threading.Thread):
         js = json_decode(task)
         if not js:
             log("json decode error:%s"%task)
-            return ""
+            return []
         result = do_work(js)
-        if len(result) == 0:
-            return ""
+        if not result:
+            return []
         text_list = []
         for r in result:
             text = json_encode(r)
@@ -95,8 +95,6 @@ class Downloader(threading.Thread):
                 log("json encode error:%s"%task)
                 continue
             text_list.append(text)
-        if len(text_list) == 0:
-            return ""
         return text_list
 
     def run(self):
@@ -124,7 +122,7 @@ class Downloader(threading.Thread):
 def request(url, hds = ""):
     data =""
     try:
-        if not hds:
+        if len(hds) == 0:
             req = urllib2.Request(url)
         else:
             req = urllib2.Request(url=url, headers=hds)
@@ -136,8 +134,8 @@ def request(url, hds = ""):
             gz = gzip.GzipFile(fileobj=StringIO.StringIO(data))
             data = gz.read()
             gz.close()
-    except urllib2.URLError, e:
-        return data
+    except:
+        return ""
     return data
 
 def request_with_proxy(url, hds):
@@ -147,7 +145,7 @@ def request_with_proxy(url, hds):
                 
         res = request(url, hds)
 
-        if not res:
+        if res != "":
             return res
 
         log("url get error: %s" % url)
@@ -172,7 +170,7 @@ def proxychange():
     global proxy_lock
     proxy_current = proxy.get()
     proxy_lock.acquire()
-    if not proxy_current:
+    if len(proxy_current) == "":
         proxy_dic = {}
     else:
         proxy_dic = {'http':proxy_current}
@@ -194,188 +192,66 @@ proxychange()
 #URL
 headers_list = [
 { 
-'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-'Accept-Encoding': 'gzip,deflate,br',
-'Accept-Language': 'zh-CN,zh;q=0.8',
-'Cache-Control': 'max-age=0',
+'Accept': '*/*',
+'Accept-Language': 'zh-CN',
 'Connection': 'keep-alive',
-'Cookie': 'UM_distinctid=15d1b17c894243-002ea993efdff2-474a0521-bf680-15d1b17c895ae2; uuid="w:53da0d0269814d9795ea6dcbaf8f11df"; _ga=GA1.2.105033893.1499398131; csrftoken=610102a9f1685f77069bc34da706bd30; WEATHER_CITY=%E5%8C%97%E4%BA%AC; tt_webid=6439865913038915086; CNZZDATA1259612802=261791786-1499393798-null%7C1501816136',
-'Host': 'www.365yg.com',
-'Upgrade-Insecure-Requests': '1',
-'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36'
-},
-{ 
-'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-'Accept-Encoding': 'gzip,deflate,br',
-'Accept-Language': 'zh-CN,zh;q=0.8',
-'Cache-Control': 'max-age=0',
-'Connection': 'keep-alive',
-'Cookie': 'tt_webid=6444465730176468494; uuid="w:1362244d4ffd4682948966da64a33e72"; UM_distinctid=15d5aed8c8c190-0c18a3b347d455-39034859-cb976-15d5aed8c8d466; csrftoken=09b9e4e727cf9b305fa33a6a6b0579e2; CNZZDATA1259612802=1241813877-1500468482-http%253A%252F%252Fwww.baidu.com%252F%7C1500468482',
-'Host': 'www.365yg.com',
-'Upgrade-Insecure-Requests': '1',
-'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'
-},
-{ 
-'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-'Accept-Encoding': 'gzip,deflate,br',
-'Accept-Language': 'zh-CN,zh;q=0.8',
-'Cache-Control': 'max-age=0',
-'Connection': 'keep-alive',
-'Cookie': 'uuid="w:9e7653eadc7245dcb91e2cebe177dd93"; sid_guard="fc5b639927ba1e6f65b84c0507138f65|1481113884|2592000|Fri\054 06-Jan-2017 12:31:24 GMT"; UM_distinctid=15c1f277b2b159-0443ec3e-3b664008-1fa400-15c1f277b2c28; _ga=GA1.2.573314528.1481110643; tt_webid=58997154152; csrftoken=fb894548384f464252b6ec3d4938cecd; WEATHER_CITY=%E5%8C%97%E4%BA%AC; utm_source=toutiao; CNZZDATA1259612802=982301074-1495170840-%7C1501219083',
-'Host': 'www.365yg.com',
-'Upgrade-Insecure-Requests': '1',
-'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36'
-},
-{ 
-'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-'Accept-Encoding': 'gzip,deflate,br',
-'Accept-Language': 'zh-CN,zh;q=0.8',
-'Cache-Control': 'max-age=0',
-'Connection': 'keep-alive',
-'Cookie': 'UM_distinctid=15d1b17c894243-002ea993efdff2-474a0521-bf680-15d1b17c895ae2; uuid="w:53da0d0269814d9795ea6dcbaf8f11df"; _ga=GA1.2.105033893.1499398131; csrftoken=610102a9f1685f77069bc34da706bd30; WEATHER_CITY=%E5%8C%97%E4%BA%AC; tt_webid=6439865913038915086; CNZZDATA1259612802=261791786-1499393798-null%7C1501816136',
-'Host': 'www.365yg.com',
-'Upgrade-Insecure-Requests': '1',
-'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36'
-},
-{ 
-'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-'Accept-Encoding': 'gzip,deflate,br',
-'Accept-Language': 'zh-CN,zh;q=0.8',
-'Cache-Control': 'max-age=0',
-'Connection': 'keep-alive',
-'Cookie': 'tt_webid=6444465730176468494; uuid="w:1362244d4ffd4682948966da64a33e72"; UM_distinctid=15d5aed8c8c190-0c18a3b347d455-39034859-cb976-15d5aed8c8d466; csrftoken=09b9e4e727cf9b305fa33a6a6b0579e2; CNZZDATA1259612802=1241813877-1500468482-http%253A%252F%252Fwww.baidu.com%252F%7C1500468482',
-'Host': 'www.365yg.com',
-'Upgrade-Insecure-Requests': '1',
-'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'
+'Host': 'ext.yinyuetai.com',
+'User-Agent': 'Dalvik/1.6.0 (Linux; U; Android 4.3; GT-N7100 Build/JSS15J)'
 }
 ]
-def get_url(text):
-    url = "http://www.365yg.com/group/"+text+"/"
+def get_url(vid):
+    url="http://ext.yinyuetai.com/main/get-h-mv-info?json=true&videoId=%s" %(vid)
     hds = headers_list[random.randint(0, len(headers_list)-1)]
     return url, hds
 
-#INFO
-def get_duration(text):
-    try:
-        v = text.split(":")
-        if len(v) == 2:
-            return int(v[0])*60+int(v[1])
-        if len(v) == 3:
-            return int(v[0])*60*60+int(v[1])*60+int(v[2])
-        return 200
-    except:
-        return 200
-
-id_reg1 = re.compile(r'(?<=\/)[^\/]+(?=\/)')
-def get_false_id(text):
-    try:
-        content = id_reg1.findall(text)
-        if content:
-            return content[-1]
-    except:
-        return ""
-
-pic_reg1 = re.compile(r'[^\/]+')
-def get_pic_url(text):
-    try:
-        content = pic_reg1.findall(text)
-        if content:
-            return "http://p1.pstatp.com/video1609/"+content[-1]
-        return text
-    except Exception,e:
-        return text
-
 run_cnt = 0
 def do_work(in_dic):
     out_dic_list = []
-    if "m_false_id" not in in_dic:
+    if "m_artist_id" not in in_dic or "m_artist_name" not in in_dic \
+        or "m_video_id" not in in_dic or "m_video_name" not in in_dic:
         return out_dic_list
 
     global run_cnt
-    if run_cnt % 40 == 0:
+    run_cnt += 1
+    if run_cnt % 100 == 0:
         proxychange()
 
-    root_id = str(in_dic["m_false_id"])
-    url, hds = get_url(root_id)
-    log("begin url: %s, %s" %(root_id, url))
+    vid = str(in_dic["m_video_id"])
+    url, hds = get_url(vid)
+    log("begin url: %s, %s" %(vid, url))
 
     #GET URL
     res = request_with_proxy(url, hds)
-    if len(res) == 0:
+    if res == "":
+        log("url request error: %s" %vid)
         return out_dic_list
-
-    #GET CONTENT
-    out_dic = in_dic
-    content = re.findall(r'(?<=videoid\:\')[^\']+', res)
-    if not content:
-        log("vid get error: %s" % root_id)
-        out_dic["m_real_id"] = "0"
-    else:
-        out_dic["m_real_id"] = content[0]
-    out_dic_list.append(out_dic)
-    return out_dic_list
-
-'''
-run_cnt = 0
-def do_work(in_dic):
-    out_dic_list = []
-    if "m_false_id" not in in_dic:
-        return out_dic_list
-
-    global run_cnt
-    if run_cnt % 40 == 0:
-        proxychange()
-
-    root_id = str(in_dic["m_false_id"])
-    url, hds = get_url(root_id)
-    log("begin url: %s, %s" %(root_id, url))
-
-    #GET URL
-    res = request_with_proxy(url, hds)
-    if len(res) == 0:
-        return out_dic_list
-
-    #GET CONTENT
-    content = re.findall(r'(?<=siblingList = \[).*?(?=\]\;)', res)
-    if not content:
-        log("content get error: %s" % root_id)
-        return out_dic_list
-    text = content[0]+","
-    
-    #GET PIECE
-    content = re.findall(r'\{.*?\}(?=\,)', text)
-    if not content:
-        log("text get error: %s" % root_id)
-        return out_dic_list
-
+        
     #GET JSON
-    for c in content:
-        js = json_decode(c)
-        if not js:
-            log("json decode error: %s" % root_id)
-            continue
-        if 'title' not in js or 'video_duration_str' not in js or 'source_url' not in js or \
-            'image_url' not in js or 'video_play_count' not in js:
-            continue
-        js['m_false_id'] = get_false_id(js['source_url'])
-        if js['m_false_id'] == "":
-            continue
-        js['m_title'] = js['title']
-        js['m_duration'] = get_duration(js['video_duration_str'])
-        js['m_img'] = get_pic_url(js['image_url'])
-        js['m_playcnt'] = js['video_play_count']
-        js['m_root_id'] = root_id
-        js['m_sch_key'] = ""
-        js['m_root_name'] = ""
-        try:
-            js['m_sch_key'] = in_dic['m_sch_key']
-            js['m_root_name'] = in_dic['m_title']
-        except:
-            pass
-        out_dic_list.append(js)
+    js = json_decode(res)
+    if not js or "videoInfo" not in js or "coreVideoInfo" not in js["videoInfo"]:
+        log("js error: %s, %s" %(vid, js))
+        return out_dic_list
+    
+    out_dic = js["videoInfo"]["coreVideoInfo"]
+    #GET CONTENT
+    try:
+        out_dic["m_video_id"] = out_dic["videoId"]
+        out_dic["m_video_name"] = out_dic["videoName"].replace("\t","")
+        out_dic["m_img"] = out_dic["headImage"]
+        out_dic["m_artist_ids"] = out_dic["artistIds"]
+        out_dic["m_artist_names"] = out_dic["artistNames"].replace("\t","")
+        out_dic["m_duration"] = out_dic["duration"]
+        out_dic["m_tag"] = out_dic["source"]
+        video_list = out_dic["videoUrlModels"]
+        video_info = video_list[len(video_list)-1]
+        out_dic["m_video_url"] = video_info["videoUrl"]
+        out_dic["m_video_size"] = video_info["fileSize"]
+        out_dic_list.append(out_dic)
+    except:
+        log("content error: %s" %vid)
+        pass
 
     return out_dic_list
-'''
 
 #--------- user define end -------------------
 
