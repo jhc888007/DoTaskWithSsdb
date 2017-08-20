@@ -20,7 +20,7 @@ sys.setdefaultencoding('UTF-8')
 
 #--------- user define begin -------------------
 #THREAD
-THREAD_NUM = 4
+THREAD_NUM = 5
 THREAD_SLEEP_TIME = 0
 THREAD_REST_TIME = 30
 
@@ -38,7 +38,10 @@ OUTPUT = "task_test2"
 ERROR = "task_test3"
 
 #log
-LOG_PATH = "./data/do_task.log"
+LOG_PATH = "./do_yinyuetai_id.log"
+
+#stop sign
+STOP_PATH = "./stop.sign"
 
 #--------- user define end -------------------
 
@@ -100,6 +103,9 @@ class Downloader(threading.Thread):
     def run(self):
         count = 0
         while 1:
+            if STOP_PATH:
+                if os.path.exists(STOP_PATH):
+                    break
             if INPUT:
                 task = self.queue_input.pop()
                 if task == "":
@@ -168,8 +174,9 @@ def proxychange():
     global proxy
     global proxy_current
     global proxy_lock
+    if proxy_lock.acquire(False) == False:
+        return
     proxy_current = proxy.get()
-    proxy_lock.acquire()
     if len(proxy_current) == "":
         proxy_dic = {}
     else:
@@ -185,7 +192,10 @@ def proxyerror():
     global proxy
     global proxy_current
     global proxy_lock
+    if proxy_lock.acquire(False) == False:
+        return
     proxy.error(proxy_current)
+    proxy_lock.release()
     proxychange()
 proxychange()
 
@@ -196,6 +206,84 @@ headers_list = [
 'Accept-Language': 'zh-CN',
 'Connection': 'keep-alive',
 'Host': 'ext.yinyuetai.com',
+'Cookie': 'JSESSIONID=aaa0LJOZKMfu9hGyHH92d',
+'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_3 like Mac OS X) AppleWebKit/603.3.8 (KHTML, like Gecko) Mobile/14G6'
+#'User-Agent': 'Dalvik/1.6.0 (Linux; U; Android 4.3; GT-N7100 Build/JSS15J)'
+},
+{ 
+'Accept': '*/*',
+'Accept-Language': 'zh-CN',
+'Connection': 'keep-alive',
+'Host': 'ext.yinyuetai.com',
+'Cookie': 'JSESSIONID=aaa0LJOZKMfu9hGyHH93a',
+'User-Agent': 'Dalvik/1.6.0 (Linux; U; Android 4.3; GT-N7100 Build/JSS15J)'
+},
+{ 
+'Accept': '*/*',
+'Accept-Language': 'zh-CN',
+'Connection': 'keep-alive',
+'Host': 'ext.yinyuetai.com',
+'Cookie': 'JSESSIONID=aaa0LJOZKMfu9hGyHH92f',
+'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_3 like Mac OS X) AppleWebKit/603.3.8 (KHTML, like Gecko) Mobile/14G6'
+#'User-Agent': 'Dalvik/1.6.0 (Linux; U; Android 4.3; GT-N7100 Build/JSS15J)'
+},
+{ 
+'Accept': '*/*',
+'Accept-Language': 'zh-CN',
+'Connection': 'keep-alive',
+'Host': 'ext.yinyuetai.com',
+'Cookie': 'JSESSIONID=aaa0LJOZKMfu9hGyHH93e',
+'User-Agent': 'Dalvik/1.6.0 (Linux; U; Android 4.3; GT-N7100 Build/JSS15J)'
+},
+{ 
+'Accept': '*/*',
+'Accept-Language': 'zh-CN',
+'Connection': 'keep-alive',
+'Host': 'ext.yinyuetai.com',
+'Cookie': 'JSESSIONID=aaa0LJOZKMfu9hGyHH91c',
+'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_3 like Mac OS X) AppleWebKit/603.3.8 (KHTML, like Gecko) Mobile/14G6'
+#'User-Agent': 'Dalvik/1.6.0 (Linux; U; Android 4.3; GT-N7100 Build/JSS15J)'
+},
+{ 
+'Accept': '*/*',
+'Accept-Language': 'zh-CN',
+'Connection': 'keep-alive',
+'Host': 'ext.yinyuetai.com',
+'Cookie': 'JSESSIONID=aaa0LJOZKMfu9hGyHH91e',
+'User-Agent': 'Dalvik/1.6.0 (Linux; U; Android 4.3; GT-N7100 Build/JSS15J)'
+},
+{ 
+'Accept': '*/*',
+'Accept-Language': 'zh-CN',
+'Connection': 'keep-alive',
+'Host': 'ext.yinyuetai.com',
+'Cookie': 'JSESSIONID=aaa0LJOZKMfu9hGyHH92t',
+'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_3 like Mac OS X) AppleWebKit/603.3.8 (KHTML, like Gecko) Mobile/14G6'
+#'User-Agent': 'Dalvik/1.6.0 (Linux; U; Android 4.3; GT-N7100 Build/JSS15J)'
+},
+{ 
+'Accept': '*/*',
+'Accept-Language': 'zh-CN',
+'Connection': 'keep-alive',
+'Host': 'ext.yinyuetai.com',
+'Cookie': 'JSESSIONID=aaa0LJOZKMfu9hGyHH92y',
+'User-Agent': 'Dalvik/1.6.0 (Linux; U; Android 4.3; GT-N7100 Build/JSS15J)'
+},
+{ 
+'Accept': '*/*',
+'Accept-Language': 'zh-CN',
+'Connection': 'keep-alive',
+'Host': 'ext.yinyuetai.com',
+'Cookie': 'JSESSIONID=aaa0LJOZKMfu9hGyHH91f',
+'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_3 like Mac OS X) AppleWebKit/603.3.8 (KHTML, like Gecko) Mobile/14G6'
+#'User-Agent': 'Dalvik/1.6.0 (Linux; U; Android 4.3; GT-N7100 Build/JSS15J)'
+},
+{ 
+'Accept': '*/*',
+'Accept-Language': 'zh-CN',
+'Connection': 'keep-alive',
+'Host': 'ext.yinyuetai.com',
+'Cookie': 'JSESSIONID=aaa0LJOZKMfu9hGyHH91b',
 'User-Agent': 'Dalvik/1.6.0 (Linux; U; Android 4.3; GT-N7100 Build/JSS15J)'
 }
 ]
@@ -213,7 +301,7 @@ def do_work(in_dic):
 
     global run_cnt
     run_cnt += 1
-    if run_cnt % 100 == 0:
+    if run_cnt % 10 == 0:
         proxychange()
 
     vid = str(in_dic["m_video_id"])
